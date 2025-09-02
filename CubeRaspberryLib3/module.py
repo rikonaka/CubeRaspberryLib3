@@ -90,10 +90,10 @@ class Cube(object):
 
         try:
             conn.write_byte_data(i2c_addr, reg_rgb_speed, speed)
-            if self.delay > 0:
+            if delay > 0:
                 time.sleep(delay)
         except Exception as e:
-            print("set_rgb_peed failed: {}".format(e))
+            print("set_rgb_speed failed: {}".format(e))
 
     def set_rbg_color(self, color: int):
         """
