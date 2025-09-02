@@ -1,3 +1,3 @@
 __all__ = ["Cube"]
 
-from .core import Cube
+from .module import Cube

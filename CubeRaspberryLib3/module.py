@@ -14,7 +14,7 @@ class Cube(object):
         self.__reg_rgb_color = 0x06
 
     def __del__(self):
-        print("CubeRaspberry3 End!")
+        print("Cube End!")
 
     def set_fan(self, state: int):
         """

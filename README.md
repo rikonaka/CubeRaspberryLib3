@@ -21,3 +21,11 @@ pip install -e .
 ```
 pip install .
 ```
+
+
+## Examples
+
+```python3
+from CubeRaspberryLib3 import Cube
+cube = Cube(i2c_bus_number=1)
+```
