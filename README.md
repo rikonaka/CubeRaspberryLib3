@@ -12,14 +12,16 @@ Please check if there is any `i2c-*` device in `/dev`. If not, please use `raspi
 
 ### Developer Local Installation
 
-```
+Download the source file from [here](https://github.com/rikonaka/CubeRaspberryLib3)
+
+```bash
 pip install -e .
 ```
 
 ### Normal installation
 
-```
-pip install .
+```bash
+pip install CubeRaspberryLib3
 ```
 
 ## Examples
