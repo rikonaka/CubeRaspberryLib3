@@ -46,7 +46,7 @@ class Cube(object):
         """
         Control RGB light effect:
         0 off effect, 1 breathing light, 2 marquee light, 3 rainbow light
-        4 dazzling lights, 5 running water lights, 6 Circulation breathing lights
+        4 dazzling lights, 5 running water lights, 6 circulation breathing lights
         """
 
         if not isinstance(effect, int):
