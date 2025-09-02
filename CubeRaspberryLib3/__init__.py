@@ -1,3 +1,4 @@
-__all__ = ["Cube"]
+__all__ = ["Cube", "OLED"]
 
 from .module import Cube
+from .module import OLED
