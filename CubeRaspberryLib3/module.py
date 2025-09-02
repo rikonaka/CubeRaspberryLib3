@@ -145,18 +145,18 @@ class Cube(object):
         try:
             # Turn off RGB light effects
             conn.write_byte_data(i2c_addr, reg_rgb_effect, 0)
-            if self.delay > 0:
-                time.sleep(delay)
-            self.__i2c_bus_connection.write_byte_data(i2c_addr, 0x00, int(index) & 0xFF)
             if delay > 0:
                 time.sleep(delay)
-            self.__i2c_bus_connection.write_byte_data(i2c_addr, 0x01, int(r) & 0xFF)
+            conn.write_byte_data(i2c_addr, 0x00, index & 0xFF)
             if delay > 0:
                 time.sleep(delay)
-            self.__i2c_bus_connection.write_byte_data(i2c_addr, 0x02, int(g) & 0xFF)
+            conn.write_byte_data(i2c_addr, 0x01, r & 0xFF)
             if delay > 0:
                 time.sleep(delay)
-            self.__i2c_bus_connection.write_byte_data(i2c_addr, 0x03, int(b) & 0xFF)
+            conn.write_byte_data(i2c_addr, 0x02, g & 0xFF)
+            if delay > 0:
+                time.sleep(delay)
+            conn.write_byte_data(i2c_addr, 0x03, b & 0xFF)
             if delay > 0:
                 time.sleep(delay)
         except Exception as e:
