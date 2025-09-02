@@ -27,4 +27,5 @@ pip install .
 ```python3
 from CubeRaspberryLib3 import Cube
 cube = Cube(i2c_bus_number=1)
+cube.set_fan(0)
 ```
