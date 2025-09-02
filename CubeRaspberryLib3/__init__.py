@@ -1,3 +1,3 @@
-__all__ = ["CubeRaspberry3"]
+__all__ = ["Cube"]
 
-from .core import CubeRaspberry3
+from .core import Cube

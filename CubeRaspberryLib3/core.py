@@ -2,7 +2,7 @@ import smbus2
 import time
 
 
-class CubeRaspberry3(object):
+class Cube(object):
     def __init__(self, i2c_bus_number: int = 1, delay: float = 0.002):
         self.__delay = delay
         self.__i2c_bus_connection = smbus2.SMBus(i2c_bus_number)
