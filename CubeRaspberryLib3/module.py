@@ -11,7 +11,10 @@ import Adafruit_SSD1306 as SSD
 class OLED(object):
     """Control of OLED display equipment"""
 
-    def __init__(self, i2c_bus_number: int = 1, clear: bool = False):
+    def __init__(self, i2c_bus_number: int = 1):
+        if not isinstance(i2c_bus_number, int):
+            raise TypeError("i2c_bus_number must be of type int")
+
         self.__init_y = -2
         self.__init_x = 0
 
