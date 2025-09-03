@@ -11,15 +11,25 @@ import Adafruit_SSD1306 as SSD
 class OLED(object):
     """Control of OLED display equipment"""
 
-    def __init__(self, i2c_bus_number: int = 1):
+    def __init__(
+        self, i2c_bus_number: int = 1, row_height: int = 9, debug: bool = False
+    ):
         if not isinstance(i2c_bus_number, int):
             raise TypeError("i2c_bus_number must be of type int")
+        if not isinstance(row_height, int):
+            raise TypeError("row_height must be of type int")
+        if not isinstance(debug, bool):
+            raise TypeError("debug must be of type bool")
 
+        self.__i2c_bus = i2c_bus_number
+        self.__row_height = row_height
+        self.__debug = debug
+
+        # Maximize the use of the entire OLED screen
         self.__init_y = -2
         self.__init_x = 0
 
-        self.__i2c_bus_number = i2c_bus_number
-
+        # OLED sceen width and height
         self.__width = 128
         self.__height = 32
         self.__image = Image.new("1", (self.__width, self.__height))
@@ -27,13 +37,13 @@ class OLED(object):
         self.__font = ImageFont.load_default()
 
     def __del__(self):
-        # print("OLED End!")
-        pass
+        if self.__debug:
+            print("OLED End!")
 
     def init(self) -> bool:
         """Initialize OLED, return True on success, False on failure"""
 
-        i2c_bus = self.__i2c_bus_number
+        i2c_bus = self.__i2c_bus
 
         try:
             oled = SSD.SSD1306_128_32(rst=None, i2c_bus=i2c_bus, gpio=1)
@@ -41,24 +51,36 @@ class OLED(object):
             print("init SSD1306_128_32 failed: {}".format(e))
             print("OLED device no found: i2c_bus[{}]".format(i2c_bus))
             return False
+        else:
+            if self.__debug:
+                print("init oled done")
 
         try:
             oled.begin()
         except Exception as e:
             print("init begin failed: {}".format(e))
             return False
+        else:
+            if self.__debug:
+                print("oled begin")
 
         try:
             oled.clear()
         except Exception as e:
             print("init clear failed: {}".format(e))
             return False
+        else:
+            if self.__debug:
+                print("oled clear")
 
         try:
             oled.display()
         except Exception as e:
             print("init display failed: {}".format(e))
             return False
+        else:
+            if self.__debug:
+                print("oled display")
 
         self.__oled = oled
         return True
@@ -76,6 +98,10 @@ class OLED(object):
         width = self.__width
         height = self.__height
 
+        # Upper left corner coordinates is (0, 0)
+        # Lower right corner coordinates is (width, height)
+        # Border color is 0 (black)
+        # Inner fill color is 0 (black)
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
         if refresh:
@@ -87,8 +113,10 @@ class OLED(object):
             else:
                 return True
         else:
-            # print("not refresh right now")
-            pass
+            if self.__debug:
+                print("not refresh right now")
+
+        return True
 
     def add_text(self, start_x: int, start_y: int, text: str, refresh: bool = False):
         """
@@ -116,9 +144,12 @@ class OLED(object):
         else:
             init_x = self.__init_x
             init_y = self.__init_y
-            x = int(start_x + init_x)
-            y = int(start_y + init_y)
+            x = start_x + init_x
+            y = start_y + init_y
+            # The upper left corner of the text is (x, y) with white text (fill=255)
             draw.text((x, y), text, font=font, fill=255)
+            if self.__debug:
+                print("draw text now")
             if refresh:
                 self.refresh()
 
@@ -139,8 +170,11 @@ class OLED(object):
         if row < 0 or row > 3:
             print("oled line input error")
         else:
-            y = int(8 * (row - 1))
+            row_height = self.__row_height
+            y = row_height * row
             self.add_text(0, y, text, refresh)
+            if self.__debug:
+                print("add row now")
 
     def refresh(self):
         """Refresh the OLED to display the content"""
@@ -153,13 +187,20 @@ class OLED(object):
 class Cube(object):
     """Control of peripheral devices such as fans and lights"""
 
-    def __init__(self, i2c_bus_number: int = 1, delay: float = 0.002):
-        self.__delay = delay
-
+    def __init__(
+        self, i2c_bus_number: int = 1, delay: float = 0.002, debug: bool = False
+    ):
         if not isinstance(i2c_bus_number, int):
             raise TypeError("i2c_bus_number must be of type int")
-        else:
-            self.__i2c_bus = smbus2.SMBus(i2c_bus_number)
+        if not isinstance(delay, float):
+            raise TypeError("delay must be of type float")
+        if not isinstance(debug, bool):
+            raise TypeError("debug must be of type bool")
+
+        self.__delay = delay
+        self.__debug = debug
+
+        self.__i2c_bus = smbus2.SMBus(i2c_bus_number)
 
         self.__i2c_addr = 0x0E
         self.__reg_fan = 0x08
@@ -168,8 +209,8 @@ class Cube(object):
         self.__reg_rgb_color = 0x06
 
     def __del__(self):
-        # print("Cube End!")
-        pass
+        if self.__debug:
+            print("Cube End!")
 
     def set_fan(self, state: int):
         """
@@ -196,6 +237,9 @@ class Cube(object):
                 time.sleep(delay)
         except Exception as e:
             print("set_fan failed: {}".format(e))
+        else:
+            if self.__debug:
+                print("set_fan ok")
 
     def set_rgb_effect(self, effect: int):
         """
@@ -223,6 +267,9 @@ class Cube(object):
                 time.sleep(delay)
         except Exception as e:
             print("set_rgb_effect failed: {}".format(e))
+        else:
+            if self.__debug:
+                print("set_rgb_effect ok")
 
     def set_rgb_speed(self, speed: int):
         """
@@ -249,6 +296,9 @@ class Cube(object):
                 time.sleep(delay)
         except Exception as e:
             print("set_rgb_speed failed: {}".format(e))
+        else:
+            if self.__debug:
+                print("set_rgb_speed ok")
 
     def set_rbg_color(self, color: int):
         """
@@ -275,6 +325,9 @@ class Cube(object):
                 time.sleep(delay)
         except Exception as e:
             print("set_rgb_color failed: {}".format(e))
+        else:
+            if self.__debug:
+                print("set_rgb_color ok")
 
     def set_single_color(self, index: int, r: int, g: int, b: int):
         """
@@ -316,6 +369,9 @@ class Cube(object):
                 time.sleep(delay)
         except Exception as e:
             print("set_single_color failed: {}".format(e))
+        else:
+            if self.__debug:
+                print("set_single_color ok")
 
     def get_Version(self):
         """Obtain the firmware version number"""
