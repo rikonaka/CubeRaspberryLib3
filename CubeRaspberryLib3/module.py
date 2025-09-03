@@ -12,7 +12,7 @@ class OLED(object):
     """Control of OLED display equipment"""
 
     def __init__(
-        self, i2c_bus_number: int = 1, row_height: int = 9, debug: bool = False
+        self, i2c_bus_number: int = 1, row_height: int = 8, debug: bool = False
     ):
         if not isinstance(i2c_bus_number, int):
             raise TypeError("i2c_bus_number must be of type int")
