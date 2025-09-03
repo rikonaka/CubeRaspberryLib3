@@ -12,15 +12,10 @@ class OLED(object):
     """Control of OLED display equipment"""
 
     def __init__(self, i2c_bus_number: int = 1, clear: bool = False):
-        self.__clear = clear
-        self.__clear_count = 0
-        self.__top = -2
-        self.__x = 0
+        self.__init_y = -2
+        self.__init_x = 0
 
         self.__i2c_bus_number = i2c_bus_number
-
-        self.__total_last = 0
-        self.__idle_last = 0
 
         self.__width = 128
         self.__height = 32
@@ -116,8 +111,10 @@ class OLED(object):
         if start_x > width or start_x < 0 or start_y < 0 or start_y > height:
             print("input () out of display range")
         else:
-            x = int(start_x + self.__x)
-            y = int(start_y + self.__top)
+            init_x = self.__init_x
+            init_y = self.__init_y
+            x = int(start_x + init_x)
+            y = int(start_y + init_y)
             draw.text((x, y), text, font=font, fill=255)
             if refresh:
                 self.refresh()
