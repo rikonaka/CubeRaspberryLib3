@@ -127,11 +127,31 @@ class OLED(object):
 
         draw = self.__draw
         width = self.__width
+        height = self.__height
+
+        min_v = 0
+        max_v = 0
+        # [(0, 1), (1, 5), (2, 9)...]
+        for i, p in points:
+            if i == 0:
+                min_v = p
+                max_v = p
+            else:
+                if p > max_v:
+                    max_v = p
+                else:
+                    min_v = p
 
         if len(points) > width:
-            print(
+            raise TypeError(
                 "input out of display range, max point length is {}, but input length is {}".format(
                     width, len(points)
+                )
+            )
+        elif min_v < 0 or max_v > height:
+            raise TypeError(
+                "input out of display range, max point value is {}, min point value is {}, it should be in range [0, {}]".format(
+                    max_v, min_v, height
                 )
             )
         else:
