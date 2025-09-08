@@ -118,6 +118,29 @@ class OLED(object):
 
         return True
 
+    def add_line(self, points: list, refresh: bool = False):
+        """Draw a line chart"""
+        if not isinstance(points, list):
+            raise TypeError("points must be of type list")
+        if not isinstance(refresh, bool):
+            raise TypeError("refresh must be of type bool")
+
+        draw = self.__draw
+        width = self.__width
+
+        if len(points) > width:
+            print(
+                "input out of display range, max point length is {}, but input length is {}".format(
+                    width, len(points)
+                )
+            )
+        else:
+            draw.line(points, fill=255)
+            if self.__debug:
+                print("draw text now")
+            if refresh:
+                self.refresh()
+
     def add_text(self, start_x: int, start_y: int, text: str, refresh: bool = False):
         """
         Add characters:
@@ -140,7 +163,7 @@ class OLED(object):
         font = self.__font
 
         if start_x > width or start_x < 0 or start_y < 0 or start_y > height:
-            print("input () out of display range")
+            print("input out of display range")
         else:
             init_x = self.__init_x
             init_y = self.__init_y
