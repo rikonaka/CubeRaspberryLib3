@@ -309,7 +309,6 @@ class Cube(object):
         self.__reg_rgb_effect = 0x04
         self.__reg_rgb_speed = 0x05
         self.__reg_rgb_color = 0x06
-        self.__reg_rgb_off = 0x07
         self.__reg_fan = 0x08
 
     def __del__(self):
@@ -359,6 +358,14 @@ class Cube(object):
 
         return state
 
+    def set_rgb_off(self):
+        """Turn off RGB light effect."""
+
+        self.set_single_color(0, 0, 0, 0)
+
+        if self.__debug:
+            print("set_rgb_off ok")
+
     def set_rgb_effect(self, effect: int):
         """
         Control RGB light effect:
@@ -388,40 +395,6 @@ class Cube(object):
 
         if self.__debug:
             print("set_rgb_effect ok")
-
-    def set_rgb(self, state: int):
-        """
-        Control RGB light:
-        state=0 off, state=1 on.
-        """
-
-        conn = self.__i2c_bus
-        i2c_addr = self.__i2c_addr
-        reg_rgb_off = self.__reg_rgb_off
-        delay = self.__delay
-
-        try:
-            conn.write_byte_data(i2c_addr, reg_rgb_off, state)
-            if delay > 0:
-                time.sleep(delay)
-        except Exception as e:
-            raise RuntimeError("set_rgb failed: {}".format(e))
-        if self.__debug:
-            print("set_rgb ok")
-
-    def get_rgb(self) -> int:
-        """Obtain the current RGB light status: 0 off, 1 on."""
-
-        conn = self.__i2c_bus
-        i2c_addr = self.__i2c_addr
-        reg_rgb_off = self.__reg_rgb_off
-
-        try:
-            state = conn.read_byte_data(i2c_addr, reg_rgb_off)
-        except Exception as e:
-            raise RuntimeError("get_rgb failed: {}".format(e))
-
-        return state
 
     def get_rgb_effect(self) -> int:
         """Obtain the current RGB light effect."""
