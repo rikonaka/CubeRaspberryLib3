@@ -411,6 +411,20 @@ class Cube(object):
         if self.__debug:
             print("on_rgb ok")
 
+    def get_rgb_state(self) -> int:
+        """Obtain the current RGB light status: 0 off, 1 on."""
+
+        conn = self.__i2c_bus
+        i2c_addr = self.__i2c_addr
+        reg_rgb_off = self.__reg_rgb_off
+
+        try:
+            state = conn.read_byte_data(i2c_addr, reg_rgb_off)
+        except Exception as e:
+            raise TypeError("get_rgb_state failed: {}".format(e))
+
+        return state
+
     def get_rgb_effect(self) -> int:
         """Obtain the current RGB light effect."""
 
