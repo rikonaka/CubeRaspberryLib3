@@ -90,7 +90,7 @@ class OLED(object):
 
         self.__oled = oled
 
-    def clear(self, refresh: bool = False) -> bool:
+    def clear(self, refresh: bool = False):
         """
         Clear the display:
         refresh =True refresh immediately, refresh=False opposite.
