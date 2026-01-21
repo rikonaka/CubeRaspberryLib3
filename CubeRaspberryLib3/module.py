@@ -58,7 +58,7 @@ class OLED(object):
         try:
             oled = SSD.SSD1306_128_32(rst=None, i2c_bus=i2c_bus, gpio=1)
         except Exception as e:
-            raise TypeError(
+            raise ValueError(
                 "init SSD1306_128_32 failed: {}, i2c_bus[{}]".format(e, i2c_bus)
             )
         if self.__debug:
@@ -67,7 +67,7 @@ class OLED(object):
         try:
             oled.begin()
         except Exception as e:
-            raise TypeError("init begin failed: {}".format(e))
+            raise RuntimeError("init begin failed: {}".format(e))
 
         if self.__debug:
             print("oled begin")
@@ -75,7 +75,7 @@ class OLED(object):
         try:
             oled.clear()
         except Exception as e:
-            raise TypeError("init clear failed: {}".format(e))
+            raise RuntimeError("init clear failed: {}".format(e))
 
         if self.__debug:
             print("oled clear")
@@ -83,7 +83,7 @@ class OLED(object):
         try:
             oled.display()
         except Exception as e:
-            raise TypeError("init display failed: {}".format(e))
+            raise RuntimeError("init display failed: {}".format(e))
 
         if self.__debug:
             print("oled display")
@@ -119,7 +119,7 @@ class OLED(object):
             try:
                 self.refresh()
             except Exception as e:
-                raise TypeError("OLED refresh failed: {}".format(e))
+                raise RuntimeError("OLED refresh failed: {}".format(e))
 
         if self.__debug:
             print("not refresh right now")
@@ -152,13 +152,13 @@ class OLED(object):
                     min_v = p
 
         if len(points) > width:
-            raise TypeError(
+            raise ValueError(
                 "input out of display range, max point length is {}, but input length is {}".format(
                     width, len(points)
                 )
             )
         elif min_v < 0 or max_v > height:
-            raise TypeError(
+            raise ValueError(
                 "input out of display range, max point value is {}, min point value is {}, it should be in range [0, {}]".format(
                     max_v, min_v, height
                 )
@@ -170,7 +170,7 @@ class OLED(object):
             if refresh:
                 self.refresh()
 
-    def get_points(self) -> list:
+    def get_line(self) -> list:
         """Get the current line chart points."""
         return self.__points
 
@@ -199,7 +199,7 @@ class OLED(object):
         self.__display_mode = 1
 
         if start_x > width or start_x < 0 or start_y < 0 or start_y > height:
-            print("input out of display range")
+            raise ValueError("input out of display range")
         else:
             init_x = self.__init_x
             init_y = self.__init_y
@@ -242,7 +242,7 @@ class OLED(object):
         self.__display_mode = 2
 
         if row < 0 or row > 3:
-            print("oled line input error")
+            raise ValueError("oled line input error")
         else:
             row_height = self.__row_height
             y = row_height * row
@@ -250,9 +250,21 @@ class OLED(object):
             if self.__debug:
                 print("add row now")
 
-    def get_rows(self) -> tuple:
-        """Get the current multiple lines of text."""
-        return (self.__text_0, self.__text_1, self.__text_2, self.__text_3)
+    def get_rows(self, row: int) -> str:
+        """Get the lines of text content."""
+        if not isinstance(row, int):
+            raise TypeError("row must be of type int")
+
+        if row == 0:
+            return self.__text_0
+        elif row == 1:
+            return self.__text_1
+        elif row == 2:
+            return self.__text_2
+        elif row == 3:
+            return self.__text_3
+        else:
+            raise ValueError("row must be between 0 and 3")
 
     def refresh(self):
         """Refresh the OLED to display the content"""
@@ -328,7 +340,7 @@ class Cube(object):
             if delay > 0:
                 time.sleep(delay)
         except Exception as e:
-            raise TypeError("set_fan failed: {}".format(e))
+            raise RuntimeError("set_fan failed: {}".format(e))
 
         if self.__debug:
             print("set_fan ok")
@@ -343,7 +355,7 @@ class Cube(object):
         try:
             state = conn.read_byte_data(i2c_addr, reg_fan)
         except Exception as e:
-            raise TypeError("get_fan failed: {}".format(e))
+            raise RuntimeError("get_fan failed: {}".format(e))
 
         return state
 
@@ -372,13 +384,16 @@ class Cube(object):
             if delay > 0:
                 time.sleep(delay)
         except Exception as e:
-            raise TypeError("set_rgb_effect failed: {}".format(e))
+            raise RuntimeError("set_rgb_effect failed: {}".format(e))
 
         if self.__debug:
             print("set_rgb_effect ok")
 
-    def set_rgb_off(self):
-        """Turn off RGB light."""
+    def set_rgb(self, state: int):
+        """
+        Control RGB light:
+        state=0 off, state=1 on.
+        """
 
         conn = self.__i2c_bus
         i2c_addr = self.__i2c_addr
@@ -386,34 +401,15 @@ class Cube(object):
         delay = self.__delay
 
         try:
-            conn.write_byte_data(i2c_addr, reg_rgb_off, 0)
+            conn.write_byte_data(i2c_addr, reg_rgb_off, state)
             if delay > 0:
                 time.sleep(delay)
         except Exception as e:
-            raise TypeError("off_rgb failed: {}".format(e))
-
+            raise RuntimeError("set_rgb failed: {}".format(e))
         if self.__debug:
-            print("off_rgb ok")
+            print("set_rgb ok")
 
-    def set_rgb_on(self):
-        """Turn on RGB light."""
-
-        conn = self.__i2c_bus
-        i2c_addr = self.__i2c_addr
-        reg_rgb_off = self.__reg_rgb_off
-        delay = self.__delay
-
-        try:
-            conn.write_byte_data(i2c_addr, reg_rgb_off, 1)
-            if delay > 0:
-                time.sleep(delay)
-        except Exception as e:
-            raise TypeError("on_rgb failed: {}".format(e))
-
-        if self.__debug:
-            print("on_rgb ok")
-
-    def get_rgb_state(self) -> int:
+    def get_rgb(self) -> int:
         """Obtain the current RGB light status: 0 off, 1 on."""
 
         conn = self.__i2c_bus
@@ -423,7 +419,7 @@ class Cube(object):
         try:
             state = conn.read_byte_data(i2c_addr, reg_rgb_off)
         except Exception as e:
-            raise TypeError("get_rgb_state failed: {}".format(e))
+            raise RuntimeError("get_rgb failed: {}".format(e))
 
         return state
 
@@ -437,7 +433,7 @@ class Cube(object):
         try:
             effect = conn.read_byte_data(i2c_addr, reg_rgb_effect)
         except Exception as e:
-            raise TypeError("get_rgb_effect failed: {}".format(e))
+            raise RuntimeError("get_rgb_effect failed: {}".format(e))
 
         return effect
 
@@ -465,7 +461,7 @@ class Cube(object):
             if delay > 0:
                 time.sleep(delay)
         except Exception as e:
-            raise TypeError("set_rgb_speed failed: {}".format(e))
+            raise RuntimeError("set_rgb_speed failed: {}".format(e))
 
         if self.__debug:
             print("set_rgb_speed ok")
@@ -480,7 +476,7 @@ class Cube(object):
         try:
             speed = conn.read_byte_data(i2c_addr, reg_rgb_speed)
         except Exception as e:
-            raise TypeError("get_rgb_speed failed: {}".format(e))
+            raise RuntimeError("get_rgb_speed failed: {}".format(e))
 
         return speed
 
@@ -508,12 +504,12 @@ class Cube(object):
             if delay > 0:
                 time.sleep(delay)
         except Exception as e:
-            raise TypeError("set_rgb_color failed: {}".format(e))
+            raise RuntimeError("set_rgb_color failed: {}".format(e))
 
         if self.__debug:
             print("set_rgb_color ok")
 
-    def get_rbg_color(self) -> int:
+    def get_rgb_color(self) -> int:
         """Obtain the current RGB light effect color."""
 
         conn = self.__i2c_bus
@@ -523,7 +519,7 @@ class Cube(object):
         try:
             color = conn.read_byte_data(i2c_addr, reg_rgb_color)
         except Exception as e:
-            raise TypeError("get_rbg_color failed: {}".format(e))
+            raise RuntimeError("get_rgb_color failed: {}".format(e))
 
         return color
 
@@ -563,17 +559,21 @@ class Cube(object):
             if delay > 0:
                 time.sleep(delay)
         except Exception as e:
-            raise TypeError("set_single_color failed: {}".format(e))
+            raise RuntimeError("set_single_color failed: {}".format(e))
 
         if self.__debug:
             print("set_single_color ok")
 
-    def get_version(self):
+    def get_version(self) -> int:
         """Obtain the firmware version number."""
 
         conn = self.__i2c_bus
         i2c_addr = self.__i2c_addr
         version = self.__reg_version
 
-        version = conn.read_byte_data(i2c_addr, version)
-        return version
+        try:
+            version = conn.read_byte_data(i2c_addr, version)
+        except Exception as e:
+            raise RuntimeError("get_version failed: {}".format(e))
+        else:
+            return version
