@@ -230,15 +230,6 @@ class OLED(object):
         if not isinstance(refresh, bool):
             raise TypeError("refresh must be of type bool")
 
-        if row < 0 or row > 3:
-            print("oled line input error")
-        else:
-            row_height = self.__row_height
-            y = row_height * row
-            self.add_text(0, y, text, refresh)
-            if self.__debug:
-                print("add row now")
-
         if row == 0:
             self.__text_0 = text
         elif row == 1:
@@ -247,6 +238,17 @@ class OLED(object):
             self.__text_2 = text
         elif row == 3:
             self.__text_3 = text
+
+        self.__display_mode = 2
+
+        if row < 0 or row > 3:
+            print("oled line input error")
+        else:
+            row_height = self.__row_height
+            y = row_height * row
+            self.add_text(0, y, text, refresh)
+            if self.__debug:
+                print("add row now")
 
     def get_rows(self) -> tuple:
         """Get the current multiple lines of text."""
