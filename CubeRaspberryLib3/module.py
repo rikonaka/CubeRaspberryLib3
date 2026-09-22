@@ -1,14 +1,11 @@
-import smbus2
 import time
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
-
 import Adafruit_SSD1306 as SSD
+import smbus2
+from PIL import Image, ImageDraw, ImageFont
 
 
-class OLED(object):
+class OLED:
     """Control of OLED display equipment."""
 
     def __init__(
@@ -57,33 +54,31 @@ class OLED(object):
 
         try:
             oled = SSD.SSD1306_128_32(rst=None, i2c_bus=i2c_bus, gpio=1)
-        except Exception as e:
-            raise ValueError(
-                "init SSD1306_128_32 failed: {}, i2c_bus[{}]".format(e, i2c_bus)
-            )
+        except Exception as e:  # noqa: BLE001
+            raise ValueError(f"init SSD1306_128_32 failed: {e}, i2c_bus[{i2c_bus}]")
         if self.__debug:
             print("init oled done")
 
         try:
             oled.begin()
-        except Exception as e:
-            raise RuntimeError("init begin failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"init begin failed: {e}")
 
         if self.__debug:
             print("oled begin")
 
         try:
             oled.clear()
-        except Exception as e:
-            raise RuntimeError("init clear failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"init clear failed: {e}")
 
         if self.__debug:
             print("oled clear")
 
         try:
             oled.display()
-        except Exception as e:
-            raise RuntimeError("init display failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"init display failed: {e}")
 
         if self.__debug:
             print("oled display")
@@ -118,8 +113,8 @@ class OLED(object):
         if refresh:
             try:
                 self.refresh()
-            except Exception as e:
-                raise RuntimeError("OLED refresh failed: {}".format(e))
+            except Exception as e:  # noqa: BLE001
+                raise RuntimeError(f"OLED refresh failed: {e}")
 
         if self.__debug:
             print("not refresh right now")
@@ -153,15 +148,11 @@ class OLED(object):
 
         if len(points) > width:
             raise ValueError(
-                "input out of display range, max point length is {}, but input length is {}".format(
-                    width, len(points)
-                )
+                f"input out of display range, max point length is {width}, but input length is {len(points)}"
             )
         elif min_v < 0 or max_v > height:
             raise ValueError(
-                "input out of display range, max point value is {}, min point value is {}, it should be in range [0, {}]".format(
-                    max_v, min_v, height
-                )
+                f"input out of display range, max point value is {max_v}, min point value is {min_v}, it should be in range [0, {height}]"
             )
         else:
             draw.line(points, fill=255)
@@ -285,7 +276,7 @@ class OLED(object):
             return "line"
 
 
-class Cube(object):
+class Cube:
     """Control of peripheral devices such as fans and lights."""
 
     def __init__(
@@ -338,8 +329,8 @@ class Cube(object):
             conn.write_byte_data(i2c_addr, reg_fan, state)
             if delay > 0:
                 time.sleep(delay)
-        except Exception as e:
-            raise RuntimeError("set_fan failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"set_fan failed: {e}")
 
         if self.__debug:
             print("set_fan ok")
@@ -353,8 +344,8 @@ class Cube(object):
 
         try:
             state = conn.read_byte_data(i2c_addr, reg_fan)
-        except Exception as e:
-            raise RuntimeError("get_fan failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"get_fan failed: {e}")
 
         return state
 
@@ -390,8 +381,8 @@ class Cube(object):
             conn.write_byte_data(i2c_addr, reg_rgb_effect, effect)
             if delay > 0:
                 time.sleep(delay)
-        except Exception as e:
-            raise RuntimeError("set_rgb_effect failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"set_rgb_effect failed: {e}")
 
         if self.__debug:
             print("set_rgb_effect ok")
@@ -405,8 +396,8 @@ class Cube(object):
 
         try:
             effect = conn.read_byte_data(i2c_addr, reg_rgb_effect)
-        except Exception as e:
-            raise RuntimeError("get_rgb_effect failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"get_rgb_effect failed: {e}")
 
         return effect
 
@@ -433,8 +424,8 @@ class Cube(object):
             conn.write_byte_data(i2c_addr, reg_rgb_speed, speed)
             if delay > 0:
                 time.sleep(delay)
-        except Exception as e:
-            raise RuntimeError("set_rgb_speed failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"set_rgb_speed failed: {e}")
 
         if self.__debug:
             print("set_rgb_speed ok")
@@ -448,8 +439,8 @@ class Cube(object):
 
         try:
             speed = conn.read_byte_data(i2c_addr, reg_rgb_speed)
-        except Exception as e:
-            raise RuntimeError("get_rgb_speed failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"get_rgb_speed failed: {e}")
 
         return speed
 
@@ -476,8 +467,8 @@ class Cube(object):
             conn.write_byte_data(i2c_addr, reg_rgb_color, color)
             if delay > 0:
                 time.sleep(delay)
-        except Exception as e:
-            raise RuntimeError("set_rgb_color failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"set_rgb_color failed: {e}")
 
         if self.__debug:
             print("set_rgb_color ok")
@@ -491,8 +482,8 @@ class Cube(object):
 
         try:
             color = conn.read_byte_data(i2c_addr, reg_rgb_color)
-        except Exception as e:
-            raise RuntimeError("get_rgb_color failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"get_rgb_color failed: {e}")
 
         return color
 
@@ -531,8 +522,8 @@ class Cube(object):
             conn.write_byte_data(i2c_addr, 0x03, b & 0xFF)
             if delay > 0:
                 time.sleep(delay)
-        except Exception as e:
-            raise RuntimeError("set_single_color failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"set_single_color failed: {e}")
 
         if self.__debug:
             print("set_single_color ok")
@@ -546,7 +537,7 @@ class Cube(object):
 
         try:
             version = conn.read_byte_data(i2c_addr, version)
-        except Exception as e:
-            raise RuntimeError("get_version failed: {}".format(e))
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"get_version failed: {e}")
         else:
             return version
